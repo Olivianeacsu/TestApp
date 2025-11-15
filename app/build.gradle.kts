@@ -1,14 +1,19 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
 }
 
+
+
 android {
     namespace = "com.example.testapp"
     compileSdk {
         version = release(36)
     }
+
 
     defaultConfig {
         applicationId = "com.example.testapp"
@@ -17,9 +22,22 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        val localPropertiesFile = rootProject.file("local.properties")
+        val properties = Properties()
+        properties.load(localPropertiesFile.inputStream())
+        if (localPropertiesFile.exists()) {
+            properties.load(localPropertiesFile.inputStream())
+        }
+        // Return an empty string in case of property being null
+        val apiKey = properties.getProperty("api_key") ?: ""
+        // For accessing the property using BuildConfig
+        buildConfigField(
+            type = "String",
+            name = "API_KEY",
+            value = apiKey
+        )
 
-        buildConfigField  = "String", "RESROBOT_API_KEY", "\"${RESROBOT_API_KEY}\""
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
